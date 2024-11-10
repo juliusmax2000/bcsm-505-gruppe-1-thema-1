@@ -1,8 +1,5 @@
 <?php
-// Start session at the very beginning before any output
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+session_start();
 
 // Configuration
 define('MAX_FILE_SIZE', 5 * 1024 * 1024); // 5MB in Bytes
@@ -32,54 +29,43 @@ function saveToDatahalde($data) {
 
 // Generate CAPTCHA
 function generateCaptcha() {
-    $code = rand(1000, 9999);
-    $_SESSION['captcha'] = $code; // Store in session
+    $code = strval(rand(1000, 9999));
+    $_SESSION['captcha'] = $code;
     return $code;
 }
 
-// Check PDF for malicious code
-function checkPDFSecurity($filepath) {
-    if (!file_exists($filepath)) {
-        return false;
-    }
+// Check if file is a valid PDF
+function isPDF($filepath) {
+    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+    $mimeType = finfo_file($finfo, $filepath);
+    finfo_close($finfo);
     
-    $content = file_get_contents($filepath);
-    $suspicious_patterns = [
-        '/JavaScript/i',
-        '/JS/i',
-        '/Launch/i',
-        '/OpenAction/i',
-        '/AA/i'
-    ];
-    
-    foreach ($suspicious_patterns as $pattern) {
-        if (preg_match($pattern, $content)) {
-            return false;
+    // Check for PDF mime type
+    if ($mimeType === 'application/pdf') {
+        // Additional basic PDF header check
+        $handle = fopen($filepath, 'rb');
+        if ($handle) {
+            $header = fread($handle, 4);
+            fclose($handle);
+            return $header === '%PDF';
         }
     }
-    
-    return true;
+    return false;
 }
 
 $message = '';
 
-// Generate new CAPTCHA code if it doesn't exist in session
+// Generate CAPTCHA if it doesn't exist
 if (!isset($_SESSION['captcha'])) {
     $captcha = generateCaptcha();
-} else {
-    $captcha = $_SESSION['captcha'];
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Debug CAPTCHA values (remove in production)
-    // error_log("Session CAPTCHA: " . $_SESSION['captcha'] . ", Submitted CAPTCHA: " . $_POST['captcha']);
+    // Convert submitted CAPTCHA to string for comparison
+    $submitted_captcha = strval($_POST['captcha']);
+    $stored_captcha = strval($_SESSION['captcha']);
     
-    // CAPTCHA validation
-    if (!isset($_POST['captcha']) || !isset($_SESSION['captcha'])) {
-        $message = '<div class="error">CAPTCHA-Fehler: Bitte laden Sie die Seite neu!</div>';
-    } elseif ($_POST['captcha'] !== $_SESSION['captcha']) {
-        $message = '<div class="error">Falscher CAPTCHA-Code! Eingegeben: ' . htmlspecialchars($_POST['captcha']) . '</div>';
-    } else {
+    if ($submitted_captcha === $stored_captcha) {
         // Form data validation and sanitization
         $formData = [
             'firmenname' => filter_var($_POST['firmenname'] ?? '', FILTER_SANITIZE_STRING),
@@ -89,7 +75,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'fachbereich' => filter_var($_POST['fachbereich'] ?? '', FILTER_SANITIZE_STRING)
         ];
 
-        // Validate required fields
         if (empty(array_filter($formData))) {
             $message = '<div class="error">Bitte füllen Sie alle Pflichtfelder aus!</div>';
         } elseif (!isset($_FILES['pdf_file']) || empty($_FILES['pdf_file']['name'])) {
@@ -97,52 +82,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $file = $_FILES['pdf_file'];
             
-            // Check file size
             if ($file['size'] > MAX_FILE_SIZE) {
                 $message = '<div class="error">Die Datei ist zu groß! Maximale Größe ist 5MB.</div>';
             }
-            // Check file type
-            elseif ($file['type'] !== 'application/pdf') {
-                $message = '<div class="error">Nur PDF-Dateien sind erlaubt!</div>';
-            }
             else {
-                // Create upload directory if it doesn't exist
                 if (!is_dir(UPLOAD_DIR)) {
                     mkdir(UPLOAD_DIR, 0755, true);
                 }
                 
-                // Generate unique filename
                 $pdf_filename = uniqid() . '_' . basename($file['name']);
                 $upload_path = UPLOAD_DIR . $pdf_filename;
                 
                 if (move_uploaded_file($file['tmp_name'], $upload_path)) {
-                    // Security check for PDF
-                    if (checkPDFSecurity($upload_path)) {
-                        // Add PDF filename to form data
+                    if (isPDF($upload_path)) {
                         $formData['pdf_filename'] = $pdf_filename;
                         
-                        // Save data to Datenhalde
                         if (saveToDatahalde($formData)) {
                             $message = '<div class="success">Datei wurde erfolgreich hochgeladen und Daten gespeichert!</div>';
-                            // Generate new CAPTCHA after successful submission
-                            $captcha = generateCaptcha();
                         } else {
                             $message = '<div class="error">Fehler beim Speichern der Daten!</div>';
-                            // Clean up uploaded file if data saving fails
                             unlink($upload_path);
                         }
                     } else {
-                        unlink($upload_path); // Delete suspicious file
-                        $message = '<div class="error">Die PDF-Datei enthält möglicherweise schädlichen Code!</div>';
+                        unlink($upload_path);
+                        $message = '<div class="error">Die hochgeladene Datei ist keine gültige PDF-Datei!</div>';
                     }
                 } else {
                     $message = '<div class="error">Fehler beim Hochladen der Datei!</div>';
                 }
             }
         }
+    } else {
+        $message = '<div class="error">Falscher CAPTCHA-Code!</div>';
     }
     
-    // Generate new CAPTCHA code after any POST request
+    // Generate new CAPTCHA after any submission
+    $captcha = generateCaptcha();
+} else {
+    // Generate new CAPTCHA for fresh page load
     $captcha = generateCaptcha();
 }
 ?>
@@ -156,6 +133,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .error { color: red; margin: 10px 0; }
         .success { color: green; margin: 10px 0; }
         .form-group { margin: 10px 0; }
+        .captcha-code { 
+            font-size: 20px;
+            font-weight: bold;
+            background: #f0f0f0;
+            padding: 5px 10px;
+            margin-left: 10px;
+            border-radius: 3px;
+        }
     </style>
 </head>
 <body>
@@ -205,7 +190,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="form-group">
             <label for="captcha">CAPTCHA-Code eingeben:</label>
             <input type="text" name="captcha" id="captcha" required>
-            <span style="margin-left: 10px; font-weight: bold;"><?php echo $captcha; ?></span>
+            <span class="captcha-code"><?php echo $_SESSION['captcha']; ?></span>
         </div>
 
         <button type="submit">Hochladen</button>
