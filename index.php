@@ -1,5 +1,8 @@
 <?php
-session_start();
+// Start session at the very beginning before any output
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 // Configuration
 define('MAX_FILE_SIZE', 5 * 1024 * 1024); // 5MB in Bytes
@@ -30,7 +33,7 @@ function saveToDatahalde($data) {
 // Generate CAPTCHA
 function generateCaptcha() {
     $code = rand(1000, 9999);
-    $_SESSION['captcha'] = $code;
+    $_SESSION['captcha'] = $code; // Store in session
     return $code;
 }
 
@@ -60,10 +63,22 @@ function checkPDFSecurity($filepath) {
 
 $message = '';
 
+// Generate new CAPTCHA code if it doesn't exist in session
+if (!isset($_SESSION['captcha'])) {
+    $captcha = generateCaptcha();
+} else {
+    $captcha = $_SESSION['captcha'];
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Debug CAPTCHA values (remove in production)
+    // error_log("Session CAPTCHA: " . $_SESSION['captcha'] . ", Submitted CAPTCHA: " . $_POST['captcha']);
+    
     // CAPTCHA validation
-    if (!isset($_POST['captcha']) || !isset($_SESSION['captcha']) || $_POST['captcha'] != $_SESSION['captcha']) {
-        $message = '<div class="error">Falscher CAPTCHA-Code!</div>';
+    if (!isset($_POST['captcha']) || !isset($_SESSION['captcha'])) {
+        $message = '<div class="error">CAPTCHA-Fehler: Bitte laden Sie die Seite neu!</div>';
+    } elseif ($_POST['captcha'] !== $_SESSION['captcha']) {
+        $message = '<div class="error">Falscher CAPTCHA-Code! Eingegeben: ' . htmlspecialchars($_POST['captcha']) . '</div>';
     } else {
         // Form data validation and sanitization
         $formData = [
@@ -109,6 +124,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         // Save data to Datenhalde
                         if (saveToDatahalde($formData)) {
                             $message = '<div class="success">Datei wurde erfolgreich hochgeladen und Daten gespeichert!</div>';
+                            // Generate new CAPTCHA after successful submission
+                            $captcha = generateCaptcha();
                         } else {
                             $message = '<div class="error">Fehler beim Speichern der Daten!</div>';
                             // Clean up uploaded file if data saving fails
@@ -124,10 +141,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
     }
+    
+    // Generate new CAPTCHA code after any POST request
+    $captcha = generateCaptcha();
 }
-
-// Generate new CAPTCHA code
-$captcha = generateCaptcha();
 ?>
 
 <!DOCTYPE html>
@@ -186,8 +203,9 @@ $captcha = generateCaptcha();
         </div>
 
         <div class="form-group">
-            <label for="captcha">CAPTCHA-Code eingeben: <?php echo $captcha; ?></label>
+            <label for="captcha">CAPTCHA-Code eingeben:</label>
             <input type="text" name="captcha" id="captcha" required>
+            <span style="margin-left: 10px; font-weight: bold;"><?php echo $captcha; ?></span>
         </div>
 
         <button type="submit">Hochladen</button>
