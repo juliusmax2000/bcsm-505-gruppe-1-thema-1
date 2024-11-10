@@ -4,10 +4,12 @@
 1. [Introduction](#introduction)
 2. [Security Features](#security-features)
 3. [Hosting Guide](#hosting-guide)
-   - [Nginx](#nginx)
    - [Caddy](#caddy)
 
 ## Introduction
+Irgendwas hin hallo ihr netten Menschen -- Hallo ^^
+Hallo!
+Juuuuuuulius!
 
 The HN Job Board is a PHP-based web application that allows administrators to post job listings and manage them. This documentation focuses on the security features implemented in the application and provides a step-by-step guide for hosting the application using Nginx and Caddy web servers.
 
