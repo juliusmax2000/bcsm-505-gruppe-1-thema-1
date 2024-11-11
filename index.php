@@ -142,6 +142,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border-radius: 3px;
         }
     </style>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 <body>
     <h1>PDF-Dateiupload für die Stellenbörse der Hochschule Niederrhein</h1>
@@ -192,6 +193,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <input type="text" name="captcha" id="captcha" required>
             <span class="captcha-code"><?php echo $_SESSION['captcha']; ?></span>
         </div>
+
+        <div class="cf-turnstile" data-sitekey="0x4AAAAAAAzudMkcbeUQtbl5"></div>
 
         <button type="submit">Hochladen</button>
     </form>
