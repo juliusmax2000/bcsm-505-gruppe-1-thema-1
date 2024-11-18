@@ -103,6 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             background-color: #4CAF50;
             color: white;
             padding: 10px 20px;
+            margin-top: 15px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
@@ -202,6 +203,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
 
         <button type="submit" <?php echo $is_button_enabled ? '' : 'disabled'; ?>>Hochladen</button>
+        <button type="reset">Reset</button>
     </form>
 
     <script>
