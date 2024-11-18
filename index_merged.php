@@ -64,7 +64,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     ?>
     <script>
         // Reset CAPTCHA for fresh page load
-        turnstile.reset(cfCaptcha);
+        if (typeof turnstile !== 'undefined') {
+            turnstile.reset(cfCaptcha);
+        }
     </script>
     <?php
 }
