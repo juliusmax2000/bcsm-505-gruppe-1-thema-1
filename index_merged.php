@@ -16,11 +16,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         // Form data validation and sanitization
         $formData = [
-            'firmenname' => filter_var($_POST['firmenname'] ?? '', FILTER_SANITIZE_STRING),
-            'standort' => filter_var($_POST['standort'] ?? '', FILTER_SANITIZE_STRING),
-            'stellenbezeichnung' => filter_var($_POST['stellenbezeichnung'] ?? '', FILTER_SANITIZE_STRING),
-            'stellentyp' => filter_var($_POST['stellentyp'] ?? '', FILTER_SANITIZE_STRING),
-            'fachbereich' => filter_var($_POST['fachbereich'] ?? '', FILTER_SANITIZE_STRING)
+            'firmenname' => $_POST['firmenname'] ?? '',
+            'standort' => $_POST['standort'] ?? '',
+            'stellenbezeichnung' => $_POST['stellenbezeichnung'] ?? '',
+            'stellentyp' => $_POST['stellentyp'] ?? '',
+            'fachbereich' => $_POST['fachbereich'] ?? ''
         ];
 
         if (empty(array_filter($formData))) {
