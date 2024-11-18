@@ -150,7 +150,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 } else {
     ?>
     <script>
-        // Generate new CAPTCHA for fresh page load
+        // Reset CAPTCHA for fresh page load
         turnstile.reset(cfCaptcha);
     </script>
     <?php
