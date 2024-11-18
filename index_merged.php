@@ -24,14 +24,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ];
 
         if (empty(array_filter($formData))) {
-            $message = '<div class="error">Bitte füllen Sie alle Pflichtfelder aus!</div>';
+            $error_message = '<div class="error">Bitte füllen Sie alle Pflichtfelder aus!</div>';
         } elseif (!isset($_FILES['pdf_file']) || empty($_FILES['pdf_file']['name'])) {
-            $message = '<div class="error">Bitte laden Sie eine PDF-Datei hoch!</div>';
+            $error_message = '<div class="error">Bitte laden Sie eine PDF-Datei hoch!</div>';
         } else {
             $file = $_FILES['pdf_file'];
 
             if ($file['size'] > MAX_FILE_SIZE) {
-                $message = '<div class="error">Die Datei ist zu groß! Maximale Größe ist 5MB.</div>';
+                $error_message = '<div class="error">Die Datei ist zu groß! Maximale Größe ist 5MB.</div>';
             } else {
                 if (!is_dir(UPLOAD_DIR)) {
                     mkdir(UPLOAD_DIR, 0755, true);
@@ -45,17 +45,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $formData['pdf_filename'] = $pdf_filename;
 
                         if (saveToDatahalde($formData)) {
-                            $message = '<div class="success">Datei wurde erfolgreich hochgeladen und Daten gespeichert!</div>';
+                            $success_message = '<div class="success">Datei wurde erfolgreich hochgeladen und Daten gespeichert!</div>';
                         } else {
-                            $message = '<div class="error">Fehler beim Speichern der Daten!</div>';
+                            $error_message = '<div class="error">Fehler beim Speichern der Daten!</div>';
                             unlink($upload_path);
                         }
                     } else {
                         unlink($upload_path);
-                        $message = '<div class="error">Die hochgeladene Datei ist keine gültige PDF-Datei!</div>';
+                        $error_message = '<div class="error">Die hochgeladene Datei ist keine gültige PDF-Datei!</div>';
                     }
                 } else {
-                    $message = '<div class="error">Fehler beim Hochladen der Datei!</div>';
+                    $error_message = '<div class="error">Fehler beim Hochladen der Datei!</div>';
                 }
             }
         }
@@ -163,7 +163,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <label for="stellenbezeichnung">Stellenbezeichnung:</label>
             <input type="text" id="stellenbezeichnung" name="stellenbezeichnung" required>
         </div>
-        
+
         <div class="form-group">
             <label for="stellentyp">Stellentyp:</label>
             <select id="stellentyp" name="stellentyp" required>
