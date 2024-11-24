@@ -76,6 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="de">
 <head>
     <meta charset="UTF-8">
+    <link rel="shortcut icon" href="https://www.hs-niederrhein.de/fileadmin/favicon.ico" type="image/vnd.microsoft.icon">
     <title>PDF Dateiupload für die Stellenbörse der Hochschule Niederrhein</title>
     <style>
         body {
@@ -202,7 +203,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             - Daten-Speicherort: <?php echo DATA_FILE; ?>
         </div>
 
-        <button type="submit" <?php echo $is_button_enabled ? '' : 'disabled'; ?>>Hochladen</button>
+        <button id="submit" type="submit" <?php echo $is_button_enabled ? '' : 'disabled'; ?>>Hochladen</button>
         <button type="reset">Reset</button>
     </form>
 

@@ -87,3 +87,4 @@ function checkCaptcha() {
     // Return token validation message or false
     return $outcome['success'] ?? false;
 }
+?>
