@@ -103,6 +103,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </style>
 </head>
 <body>
+    <img src="https://app.hn.de/img/logo_big.png">
+
     <h1>PDF Dateiupload für die Stellenbörse der Hochschule Niederrhein</h1>
     
     <?php if ($error_message): ?>

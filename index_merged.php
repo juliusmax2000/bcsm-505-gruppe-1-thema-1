@@ -77,6 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <link rel="shortcut icon" href="https://www.hs-niederrhein.de/fileadmin/favicon.ico" type="image/vnd.microsoft.icon">
+    <img src="https://app.hn.de/img/logo_big.png">
     <title>PDF Dateiupload für die Stellenbörse der Hochschule Niederrhein</title>
     <style>
         body {
@@ -178,7 +179,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <div class="form-group">
             <label for="fachbereich">Fachbereich:</label>
-            <select id="fachbereich" name="fachbereich" required>
+            <select id="fachbereich" name="fachbereich" required, multiple>
                 <option value="">Bitte wählen</option>
                 <?php foreach ($fachbereiche as $fb): ?>
                     <option value="<?php echo htmlspecialchars($fb); ?>"><?php echo htmlspecialchars($fb); ?></option>
