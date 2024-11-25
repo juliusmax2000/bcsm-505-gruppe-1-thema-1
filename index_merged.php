@@ -77,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <link rel="shortcut icon" href="https://www.hs-niederrhein.de/fileadmin/favicon.ico" type="image/vnd.microsoft.icon">
-    <img src="https://app.hn.de/img/logo_big.png">
+    <img src="https://app.hn.de/img/logo_big.png alt="Bild kann nicht geladen werden." border="3" align="center">
     <title>PDF Dateiupload für die Stellenbörse der Hochschule Niederrhein</title>
     <style>
         body {
