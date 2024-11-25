@@ -78,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <link rel="shortcut icon" href="https://www.hs-niederrhein.de/fileadmin/favicon.ico" type="image/vnd.microsoft.icon">
     <img src="https://app.hn.de/img/logo_big.png" alt="Hochschule Niederrhein" align="center" height="258" width="800px">
-    <title>PDF Dateiupload für die Stellenbörse</title>
+    <title>PDF Dateiupload</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -140,7 +140,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 <body>
-    <h1>PDF Dateiupload für die Stellenbörse der Hochschule Niederrhein</h1>
+    <h1>PDF Dateiupload für die Stellenbörse</h1>
 
     <?php if ($error_message): ?>
         <div class="error"><?php echo htmlspecialchars($error_message); ?></div>
@@ -200,8 +200,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <strong>Upload-Informationen:</strong><br>
             - Maximale Dateigröße: 5MB<br>
             - Erlaubtes Format: PDF<br>
-            - Upload-Verzeichnis: <?php echo UPLOAD_DIR; ?><br>
-            - Daten-Speicherort: <?php echo DATA_FILE; ?>
         </div>
 
         <button id="submit" type="submit" <?php echo $is_button_enabled ? '' : 'disabled'; ?>>Hochladen</button>
