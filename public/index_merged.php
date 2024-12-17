@@ -19,8 +19,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'firmenname' => $_POST['firmenname'] ?? '',
             'standort' => $_POST['standort'] ?? '',
             'stellenbezeichnung' => $_POST['stellenbezeichnung'] ?? '',
-            'stellentyp' => $_POST['stellentyp'] ?? '',
-            'fachbereich' => $_POST['fachbereich'] ?? ''
+            'stellentyp' => $_POST['stellentyp'] ?? [], // Kann nun ein Array sein
+            'fachbereich' => $_POST['fachbereich'] ?? []  // Kann nun ein Array sein
         ];
 
         if (empty(array_filter($formData))) {
@@ -60,16 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
     }
-} else {
-    ?>
-    <script>
-        // Reset CAPTCHA for fresh page load
-        if (typeof turnstile !== 'undefined') {
-            turnstile.reset(cfCaptcha);
-        }
-    </script>
-    <?php
-}
+} 
 ?>
 
 <!DOCTYPE html>
@@ -136,6 +127,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border: 1px solid #ddd;
             border-radius: 4px;
         }
+        /* Style für die Mehrfachauswahl */
+        select[multiple] option:checked { 
+            background-color: #f0f0f5; 
+        }
     </style>
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
@@ -169,7 +164,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <div class="form-group">
             <label for="stellentyp">Stellentyp:</label>
-            <select id="stellentyp" name="stellentyp" required>
+            <select id="stellentyp" name="stellentyp[]" multiple> 
                 <option value="">Bitte wählen</option>
                 <?php foreach ($stellentypen as $typ): ?>
                     <option value="<?php echo htmlspecialchars($typ); ?>"><?php echo htmlspecialchars($typ); ?></option>
@@ -179,7 +174,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <div class="form-group">
             <label for="fachbereich">Fachbereich:</label>
-            <select id="fachbereich" name="fachbereich" required>
+            <select id="fachbereich" name="fachbereich[]" multiple> 
                 <option value="">Bitte wählen</option>
                 <?php foreach ($fachbereiche as $fb): ?>
                     <option value="<?php echo htmlspecialchars($fb); ?>"><?php echo htmlspecialchars($fb); ?></option>
