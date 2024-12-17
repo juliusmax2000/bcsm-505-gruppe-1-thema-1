@@ -52,7 +52,7 @@ function isPDF($filepath)
 // Check if the captcha is valid
 function checkCaptcha() {
     // Import Config-File
-    require_once 'config.php';
+    global $secret_key;
     // Get the Turnstile response token and IP address
     $captchaToken = $_POST['cf-turnstile-response'];
     $ip = $_SERVER['REMOTE_ADDR'];
