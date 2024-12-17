@@ -1,4 +1,5 @@
 <?php
+// functions.php
 // Function to save data to JSON file
 function saveToDatahalde($data) {
     try {
@@ -6,14 +7,14 @@ function saveToDatahalde($data) {
         $jsonContent = file_get_contents(DATA_FILE);
         $existingData = json_decode($jsonContent, true) ?: [];
         
-        // Prepare new entry
+        // Prepare new entry -  stellentyp and fachbereich are now arrays
         $newEntry = [
             'timestamp' => date('Y-m-d H:i:s'),
             'firma' => $data['firmenname'],
             'standort' => $data['standort'],
             'stelle' => $data['stellenbezeichnung'],
-            'typ' => $data['stellentyp'],
-            'fachbereich' => $data['fachbereich'],
+            'typ' => $data['stellentyp'], // Store as an array
+            'fachbereich' => $data['fachbereich'], // Store as an array
             'pdf_filename' => $data['pdf_filename']
         ];
         

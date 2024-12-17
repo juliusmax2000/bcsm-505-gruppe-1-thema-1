@@ -1,4 +1,5 @@
-<?php
+<?php 
+// config.php
 // Configuration with absolute paths
 $root_path = dirname(__FILE__);
 define('MAX_FILE_SIZE', 5 * 1024 * 1024); // 5MB in Bytes
