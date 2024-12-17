@@ -1,6 +1,14 @@
 :80, :443 {
+    @allowed {
+        path index.php
+    }
     root * /var/www/html
     php_fastcgi php:9000
     file_server
     tls internal
+
+    @blocked {
+        path *.txt *.md *.json /uploads/*
+    }
+    respond @blocked 403
 }

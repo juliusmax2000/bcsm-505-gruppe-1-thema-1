@@ -163,22 +163,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
 
         <div class="form-group">
-            <label for="stellentyp">Stellentyp: (Durch Halten der Strg Taste Mehrfachauswahl möglich)</label>
-            <select id="stellentyp" name="stellentyp[]" multiple size="<?php echo count($stellentypen); ?>"> 
-                <?php foreach ($stellentypen as $typ): ?>
-                    <option value="<?php echo htmlspecialchars($typ); ?>"><?php echo htmlspecialchars($typ); ?></option>
-                <?php endforeach; ?>
-            </select>
-        </div>
+      <label for="stellentyp">Stellentyp: <small>(durch Halten der Strg Taste Mehrfachauswahl möglich)</small></label>
+      <select id="stellentyp" name="stellentyp[]" multiple size="<?php echo count($stellentypen); ?>">
+        <?php foreach ($stellentypen as $typ): ?>
+        <option value="<?php echo htmlspecialchars($typ); ?>">
+          <?php echo htmlspecialchars($typ); ?>
+        </option>
+        <?php endforeach; ?>
+      </select>
+    </div>
 
-        <div class="form-group">
-            <label for="fachbereich">Fachbereich: (Durch Halten der Strg Taste Mehrfachauswahl möglich)</label>
-            <select id="fachbereich" name="fachbereich[]" multiple size="<?php echo count($fachbereiche); ?>"> 
-                <?php foreach ($fachbereiche as $fb): ?>
-                    <option value="<?php echo htmlspecialchars($fb); ?>"><?php echo htmlspecialchars($fb); ?></option>
-                <?php endforeach; ?>
-            </select>
-        </div>
+    <div class="form-group">
+      <label for="fachbereich">Fachbereich: <small>(durch Halten der Strg Taste Mehrfachauswahl möglich)</small></label>
+      <select id="fachbereich" name="fachbereich[]" multiple size="<?php echo count($fachbereiche); ?>">
+        <?php foreach ($fachbereiche as $fb): ?>
+        <option value="<?php echo htmlspecialchars($fb); ?>">
+          <?php echo htmlspecialchars($fb); ?>
+        </option>
+        <?php endforeach; ?>
+      </select>
+    </div>
 
         <div class="form-group">
             <label for="pdf_file">PDF-Datei (max. 5MB):</label>
