@@ -1,151 +1,75 @@
 <?php
 session_start();
 
-// Configuration with absolute paths
-$root_path = dirname(__FILE__);
-define('MAX_FILE_SIZE', 5 * 1024 * 1024); // 5MB in Bytes
-define('UPLOAD_DIR', $root_path . '/uploads/');
-define('DATA_FILE', $root_path . '/Datenhalde.json');
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
-// Create upload directory if it doesn't exist
-if (!is_dir(UPLOAD_DIR)) {
-    mkdir(UPLOAD_DIR, 0755, true);
-}
+// Import configuration and functions file
+require_once 'config.php';
+require_once 'functions.php';
 
-// Create JSON file if it doesn't exist
-if (!file_exists(DATA_FILE)) {
-    file_put_contents(DATA_FILE, "[]", LOCK_EX);
-    chmod(DATA_FILE, 0644);
-}
-
-// Arrays for dropdown menus
-$stellentypen = ["Jobs", "Praxisphasen & Praktika", "Abschlussarbeiten", "Werkstudentenstellen", "Traineestellen", "Studentische Hilfskräfte", "Tutorentätigkeit", "Jobs im Ausland", "Promotionen", "Nebenjobs (in der Region)", "Praktika", "Sonstiges"];
-$fachbereiche = ["Fachbereich 01 Chemie", "Fachbereich 02 Design", "Fachbereich 03 Elektrotechnik und Informatik", "Fachbereich 04 Maschinenbau und Verfahrenstechnik", "Fachbereich 05 Oecotrophologie", "Fachbereich 06 Sozialwesen", "Fachbereich 07 Textil- und Bekleidungstechnik", "Fachbereich 08 Wirtschaftswissenschaften", "Fachbereich 09 Wirtschaftsingenieurwesen", "Fachbereich 10 Gesundheitswesen"];
-
-// Function to save data to JSON file
-function saveToDatahalde($data) {
-    try {
-        // Read existing data
-        $jsonContent = file_get_contents(DATA_FILE);
-        $existingData = json_decode($jsonContent, true) ?: [];
-        
-        // Prepare new entry
-        $newEntry = [
-            'timestamp' => date('Y-m-d H:i:s'),
-            'firma' => $data['firmenname'],
-            'standort' => $data['standort'],
-            'stelle' => $data['stellenbezeichnung'],
-            'typ' => $data['stellentyp'], // Now an array
-            'fachbereich' => $data['fachbereich'], // Now an array
-            'pdf_filename' => $data['pdf_filename']
-        ];
-        
-        // Add new entry to array
-        $existingData[] = $newEntry;
-        
-        // Save back to file
-        return file_put_contents(DATA_FILE, json_encode($existingData, JSON_PRETTY_PRINT), LOCK_EX);
-    } catch (Exception $e) {
-        error_log("Error saving to Datenhalde: " . $e->getMessage());
-        return false;
-    }
-}
-
-// Check if file is a valid PDF
-function isPDF($filepath) {
-    $finfo = finfo_open(FILEINFO_MIME_TYPE);
-    $mimeType = finfo_file($finfo, $filepath);
-    finfo_close($finfo);
-    
-    return $mimeType === 'application/pdf';
-}
-
-function checkCaptcha() {
-    $captchaToken = $_POST['cf-turnstile-response'];
-    $ip = $_SERVER['REMOTE_ADDR'];
-    
-    $url = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
-    $data = [
-        'secret' => '0x4AAAAAAAzudDvOJ1LZy4uA5Ni44ZoDvSE',
-        'response' => $captchaToken,
-        'remoteip' => $ip
-    ];
-    
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
-    
-    $response = curl_exec($ch);
-    if ($response === false) {
-        error_log('Error with cURL: ' . curl_error($ch));
-        curl_close($ch);
-        return false;
-    }
-    
-    curl_close($ch);
-    $outcome = json_decode($response, true);
-    return $outcome['success'] ?? false;
-}
-
-$error_message = '';
-$success_message = '';
-
+// Check if form is submitted
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!checkCaptcha()) {
         $error_message = "Captcha-Verifizierung fehlgeschlagen. Bitte versuchen Sie es erneut.";
     } else {
         // Form data validation and sanitization
         $formData = [
-            'firmenname' => filter_var($_POST['firmenname'] ?? '', FILTER_SANITIZE_STRING),
-            'standort' => filter_var($_POST['standort'] ?? '', FILTER_SANITIZE_STRING),
-            'stellenbezeichnung' => filter_var($_POST['stellenbezeichnung'] ?? '', FILTER_SANITIZE_STRING),
-            'stellentyp' => $_POST['stellentyp'] ?? [], // Now an array
-            'fachbereich' => $_POST['fachbereich'] ?? [] // Now an array
+            'firmenname' => $_POST['firmenname'] ?? '',
+            'standort' => $_POST['standort'] ?? '',
+            'stellenbezeichnung' => $_POST['stellenbezeichnung'] ?? '',
+            'stellentyp' => $_POST['stellentyp'] ?? [], 
+            'fachbereich' => $_POST['fachbereich'] ?? []  
         ];
 
         if (empty(array_filter($formData))) {
-            $error_message = "Bitte füllen Sie alle Pflichtfelder aus.";
-        } elseif (!isset($_FILES['pdf_file']) || $_FILES['pdf_file']['error'] !== UPLOAD_ERR_OK) {
-            $error_message = "Bitte laden Sie eine PDF-Datei hoch.";
+            $error_message = 'Bitte füllen Sie alle Pflichtfelder aus!';
+        } elseif (!isset($_FILES['pdf_file']) || empty($_FILES['pdf_file']['name'])) {
+            $error_message = 'Bitte laden Sie eine PDF-Datei hoch!';
         } else {
             $file = $_FILES['pdf_file'];
-            
+
             if ($file['size'] > MAX_FILE_SIZE) {
-                $error_message = "Die Datei ist zu groß. Maximale Größe ist 5MB.";
+                $error_message = 'Die Datei ist zu groß! Maximale Größe ist 5MB.';
             } else {
+                if (!is_dir(UPLOAD_DIR)) {
+                    mkdir(UPLOAD_DIR, 0755, true);
+                }
+
                 $pdf_filename = uniqid() . '_' . basename($file['name']);
                 $upload_path = UPLOAD_DIR . $pdf_filename;
-                
+
                 if (move_uploaded_file($file['tmp_name'], $upload_path)) {
                     if (isPDF($upload_path)) {
                         $formData['pdf_filename'] = $pdf_filename;
-                        
+
                         if (saveToDatahalde($formData)) {
-                            $success_message = "Ihre Stellenanzeige wurde erfolgreich hochgeladen!";
+                            $success_message = 'Datei wurde erfolgreich hochgeladen und Daten gespeichert!';
                         } else {
-                            $error_message = "Fehler beim Speichern der Daten.";
+                            $error_message = 'Fehler beim Speichern der Daten!';
                             unlink($upload_path);
                         }
                     } else {
                         unlink($upload_path);
-                        $error_message = "Die hochgeladene Datei ist keine gültige PDF-Datei.";
+                        $error_message = 'Die hochgeladene Datei ist keine gültige PDF-Datei!';
                     }
                 } else {
-                    $error_message = "Fehler beim Hochladen der Datei.";
+                    $error_message = 'Fehler beim Hochladen der Datei!';
                 }
             }
         }
     }
-}
+} 
 ?>
 
 <!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>PDF Dateiupload für die Stellenbörse der Hochschule Niederrhein</title>
+    <link rel="shortcut icon" href="https://www.hs-niederrhein.de/fileadmin/favicon.ico" type="image/vnd.microsoft.icon">
+    <img src="https://app.hn.de/img/logo_big.png" alt="Hochschule Niederrhein" align="center" height="258px" width="800px">
+    <title>PDF Dateiupload</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -172,6 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             background-color: #4CAF50;
             color: white;
             padding: 10px 20px;
+            margin-top: 15px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
@@ -202,12 +127,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border: 1px solid #ddd;
             border-radius: 4px;
         }
+        /* Style für die Mehrfachauswahl */
+        select[multiple] option:checked { 
+            background-color: #f0f0f5; 
+        }
     </style>
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 <body>
-    <h1>PDF Dateiupload für die Stellenbörse der Hochschule Niederrhein</h1>
-    
+    <h1>PDF Dateiupload für die Stellenbörse</h1>
+
     <?php if ($error_message): ?>
         <div class="error"><?php echo htmlspecialchars($error_message); ?></div>
     <?php endif; ?>
@@ -215,6 +144,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php if ($success_message): ?>
         <div class="success"><?php echo htmlspecialchars($success_message); ?></div>
     <?php endif; ?>
+
 
     <form method="POST" enctype="multipart/form-data">
         <div class="form-group">
@@ -233,23 +163,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
 
         <div class="form-group">
-            <label for="stellentyp">Stellentyp:</label>
-            <select id="stellentyp" name="stellentyp[]" multiple required> 
-                <?php foreach ($stellentypen as $typ): ?>
-                    <option value="<?php echo htmlspecialchars($typ); ?>"><?php echo htmlspecialchars($typ); ?></option>
-                <?php endforeach; ?>
-            </select>
-        </div>
+      <label for="stellentyp">Stellentyp: <small>(durch Halten der Strg Taste Mehrfachauswahl möglich)</small></label>
+      <select id="stellentyp" name="stellentyp[]" multiple size="<?php echo count($stellentypen); ?>">
+        <?php foreach ($stellentypen as $typ): ?>
+        <option value="<?php echo htmlspecialchars($typ); ?>">
+          <?php echo htmlspecialchars($typ); ?>
+        </option>
+        <?php endforeach; ?>
+      </select>
+    </div>
 
-        <div class="form-group">
-            <label for="fachbereich">Fachbereich:</label>
-            <select id="fachbereich" name="fachbereich[]" multiple required> 
-                <option value="">Bitte wählen</option>
-                <?php foreach ($fachbereiche as $fb): ?>
-                    <option value="<?php echo htmlspecialchars($fb); ?>"><?php echo htmlspecialchars($fb); ?></option>
-                <?php endforeach; ?>
-            </select>
-        </div>
+    <div class="form-group">
+      <label for="fachbereich">Fachbereich: <small>(durch Halten der Strg Taste Mehrfachauswahl möglich)</small></label>
+      <select id="fachbereich" name="fachbereich[]" multiple size="<?php echo count($fachbereiche); ?>">
+        <?php foreach ($fachbereiche as $fb): ?>
+        <option value="<?php echo htmlspecialchars($fb); ?>">
+          <?php echo htmlspecialchars($fb); ?>
+        </option>
+        <?php endforeach; ?>
+      </select>
+    </div>
 
         <div class="form-group">
             <label for="pdf_file">PDF-Datei (max. 5MB):</label>
@@ -264,11 +197,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <strong>Upload-Informationen:</strong><br>
             - Maximale Dateigröße: 5MB<br>
             - Erlaubtes Format: PDF<br>
-            - Upload-Verzeichnis: <?php echo UPLOAD_DIR; ?><br>
-            - Daten-Speicherort: <?php echo DATA_FILE; ?>
         </div>
 
-        <button type="submit">Hochladen</button>
+        <button id="submit" type="submit" <?php echo $is_button_enabled ? '' : 'disabled'; ?>>Hochladen</button>
+        <button type="reset">Reset</button>
     </form>
 
     <script>
