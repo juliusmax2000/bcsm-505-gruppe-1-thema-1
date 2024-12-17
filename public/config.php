@@ -17,6 +17,10 @@ if (!file_exists(DATA_FILE)) {
     chmod(DATA_FILE, 0644);
 }
 
+// Variables for Cloudflare Turnstile Captcha-Keys
+$site_key = '0x4AAAAAAAzudMkcbeUQtbl5';
+$secret_key = '0x4AAAAAAAzudDvOJ1LZy4uA5Ni44ZoDvSE';
+
 // Arrays for dropdown menus
 $stellentypen = ["Jobs", "Praxisphasen & Praktika", "Abschlussarbeiten", "Werkstudentenstellen", "Traineestellen", "Studentische Hilfskräfte", "Tutorentätigkeit", "Jobs im Ausland", "Promotionen", "Nebenjobs (in der Region)", "Praktika", "Sonstiges"];
 $fachbereiche = ["Fachbereich 01 Chemie", "Fachbereich 02 Design", "Fachbereich 03 Elektrotechnik und Informatik", "Fachbereich 04 Maschinenbau und Verfahrenstechnik", "Fachbereich 05 Oecotrophologie", "Fachbereich 06 Sozialwesen", "Fachbereich 07 Textil- und Bekleidungstechnik", "Fachbereich 08 Wirtschaftswissenschaften", "Fachbereich 09 Wirtschaftsingenieurwesen", "Fachbereich 10 Gesundheitswesen"];

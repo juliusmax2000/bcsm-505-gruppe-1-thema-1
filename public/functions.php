@@ -51,6 +51,8 @@ function isPDF($filepath)
 
 // Check if the captcha is valid
 function checkCaptcha() {
+    // Import Config-File
+    require_once 'config.php';
     // Get the Turnstile response token and IP address
     $captchaToken = $_POST['cf-turnstile-response'];
     $ip = $_SERVER['REMOTE_ADDR'];
@@ -58,7 +60,7 @@ function checkCaptcha() {
     // Prepare the data for the verification request
     $url = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
     $data = [
-        'secret' => '0x4AAAAAAAzudDvOJ1LZy4uA5Ni44ZoDvSE',
+        'secret' => $secret_key,
         'response' => $captchaToken,
         'remoteip' => $ip
     ];

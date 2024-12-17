@@ -190,7 +190,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
 
         <div class="form-group">
-            <div id="cfCaptcha" class="cf-turnstile" data-sitekey="0x4AAAAAAAzudMkcbeUQtbl5"></div>
+            <div id="cfCaptcha" class="cf-turnstile" data-sitekey="<?= $site_key ?>"></div>
         </div>
 
         <div class="file-info">
