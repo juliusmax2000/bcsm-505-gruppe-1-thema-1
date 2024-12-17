@@ -162,23 +162,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <input type="text" id="stellenbezeichnung" name="stellenbezeichnung" required>
         </div>
 
-            <div class="form-group">
-        <label for="stellentyp">Stellentyp:</label>
-        <select id="stellentyp" name="stellentyp[]" multiple required> 
-            <?php foreach ($stellentypen as $typ): ?>
-                <option value="<?php echo htmlspecialchars($typ); ?>"><?php echo htmlspecialchars($typ); ?></option>
-            <?php endforeach; ?>
-        </select>
+        <div class="form-group">
+            <label for="stellentyp">Stellentyp: (Durch Halten der Strg Taste Mehrfachauswahl möglich)</label>
+            <select id="stellentyp" name="stellentyp[]" multiple size="<?php echo count($stellentypen); ?>"> 
+                <?php foreach ($stellentypen as $typ): ?>
+                    <option value="<?php echo htmlspecialchars($typ); ?>"><?php echo htmlspecialchars($typ); ?></option>
+                <?php endforeach; ?>
+            </select>
         </div>
 
         <div class="form-group">
-        <label for="fachbereich">Fachbereich:</label>
-        <select id="fachbereich" name="fachbereich[]" multiple required> 
-            <?php foreach ($fachbereiche as $fb): ?>
-                <option value="<?php echo htmlspecialchars($fb); ?>"><?php echo htmlspecialchars($fb); ?></option>
-            <?php endforeach; ?>
-        </select>
-        <small>Mehrfachauswahl durch Halten von Strg und Anklicken der Auswahlmöglichkeiten.</small> 
+            <label for="fachbereich">Fachbereich: (Durch Halten der Strg Taste Mehrfachauswahl möglich)</label>
+            <select id="fachbereich" name="fachbereich[]" multiple size="<?php echo count($fachbereiche); ?>"> 
+                <?php foreach ($fachbereiche as $fb): ?>
+                    <option value="<?php echo htmlspecialchars($fb); ?>"><?php echo htmlspecialchars($fb); ?></option>
+                <?php endforeach; ?>
+            </select>
         </div>
 
         <div class="form-group">
