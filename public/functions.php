@@ -1,12 +1,8 @@
 <?php
 // functions.php
 // Function to save data to JSON file
-function saveToDatahalde($data) {
+function saveToDatahalde($data, $id) {
     try {
-        // Read existing data
-        $jsonContent = file_get_contents(DATA_FILE);
-        $existingData = json_decode($jsonContent, true) ?: [];
-        
         // Prepare new entry -  stellentyp and fachbereich are now arrays
         $newEntry = [
             'timestamp' => date('Y-m-d H:i:s'),
@@ -18,11 +14,8 @@ function saveToDatahalde($data) {
             'pdf_filename' => $data['pdf_filename']
         ];
         
-        // Add new entry to array
-        $existingData[] = $newEntry;
-        
         // Save back to file
-        return file_put_contents(DATA_FILE, json_encode($existingData, JSON_PRETTY_PRINT), LOCK_EX);
+        return file_put_contents(UPLOAD_DIR . $id . ".json", json_encode($newEntry, JSON_PRETTY_PRINT), LOCK_EX);
     } catch (Exception $e) {
         error_log("Error saving to Datenhalde: " . $e->getMessage());
         return false;
@@ -51,7 +44,7 @@ function isPDF($filepath)
 
 // Check if the captcha is valid
 function checkCaptcha() {
-    // Import Config-File
+    // Import the "$secret_key"-Variable from Config-File
     global $secret_key;
     // Get the Turnstile response token and IP address
     $captchaToken = $_POST['cf-turnstile-response'];

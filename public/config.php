@@ -4,17 +4,10 @@
 $root_path = dirname(__FILE__);
 define('MAX_FILE_SIZE', 5 * 1024 * 1024); // 5MB in Bytes
 define('UPLOAD_DIR', $root_path . '/uploads/');
-define('DATA_FILE', $root_path . '/Datenhalde.json');
 
 // Create upload directory if it doesn't exist
 if (!is_dir(UPLOAD_DIR)) {
     mkdir(UPLOAD_DIR, 0755, true);
-}
-
-// Create JSON file if it doesn't exist
-if (!file_exists(DATA_FILE)) {
-    file_put_contents(DATA_FILE, "[]", LOCK_EX);
-    chmod(DATA_FILE, 0644);
 }
 
 // Variables for Cloudflare Turnstile Captcha-Keys
