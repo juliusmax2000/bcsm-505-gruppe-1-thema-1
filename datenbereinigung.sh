@@ -1,3 +1,3 @@
 #!/bin/bash
 Speicher="/home/user/caddy_test/public/uploads"
-find "$Speicher" -iname "*.pdf" -type f -mtime +30 -delete
+find "$Speicher" -type d -mtime +30 -exec rm -rf
