@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if (isPDF($upload_path)) {
                         $formData['pdf_filename'] = $pdf_filename;
 
-                        if (saveToDatahalde($formData, $unique_id)) {
+                        if (saveToDatahalde($formData, $upload_path)) {
                             $success_message = 'Datei wurde erfolgreich hochgeladen und Daten gespeichert!';
                         } else {
                             $error_message = 'Fehler beim Speichern der Daten!';

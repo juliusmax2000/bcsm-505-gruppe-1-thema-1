@@ -1,9 +1,8 @@
 <?php
 // functions.php
 // Function to save data to JSON file
-function saveToDatahalde($data, $id) {
+function saveToDatahalde($data, $filepath) {
     try {
-        $upload_path = UPLOAD_DIR . $id . "/";
         // Prepare new entry -  stellentyp and fachbereich are now arrays
         $newEntry = [
             'timestamp' => date('Y-m-d H:i:s'),
@@ -16,7 +15,7 @@ function saveToDatahalde($data, $id) {
         ];
         
         // Save back to file
-        return file_put_contents($upload_path . "metadata.json", json_encode($newEntry, JSON_PRETTY_PRINT), LOCK_EX);
+        return file_put_contents(substr($filepath, 0, -4) . '.json', json_encode($newEntry, JSON_PRETTY_PRINT), LOCK_EX);
     } catch (Exception $e) {
         error_log("Error saving to Datenhalde: " . $e->getMessage());
         return false;
