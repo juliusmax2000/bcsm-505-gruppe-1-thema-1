@@ -1,8 +1,9 @@
 <?php
 // functions.php
 // Function to save data to JSON file
-function saveToDatahalde($data, $upload_path) {
+function saveToDatahalde($data, $id) {
     try {
+        $upload_path = UPLOAD_DIR . $id . "/";
         // Prepare new entry -  stellentyp and fachbereich are now arrays
         $newEntry = [
             'timestamp' => date('Y-m-d H:i:s'),

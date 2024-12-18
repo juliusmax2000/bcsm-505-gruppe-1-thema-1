@@ -40,13 +40,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
 
                 $pdf_filename = basename($file['name']);
-                $upload_path = UPLOAD_DIR . $unique_id . $pdf_filename;
+                $upload_path = UPLOAD_DIR . $unique_id . '/' . $pdf_filename;
 
                 if (move_uploaded_file($file['tmp_name'], $upload_path)) {
                     if (isPDF($upload_path)) {
                         $formData['pdf_filename'] = $pdf_filename;
 
-                        if (saveToDatahalde($formData, UPLOAD_DIR . $unique_id)) {
+                        if (saveToDatahalde($formData, $unique_id)) {
                             $success_message = 'Datei wurde erfolgreich hochgeladen und Daten gespeichert!';
                         } else {
                             $error_message = 'Fehler beim Speichern der Daten!';
