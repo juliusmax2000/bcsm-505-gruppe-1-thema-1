@@ -15,7 +15,7 @@ function saveToDatahalde($data, $filepath) {
         ];
         
         // Save back to file
-        return file_put_contents(substr($filepath, 0, -4) . '.json', json_encode($newEntry, JSON_PRETTY_PRINT), LOCK_EX);
+        return file_put_contents(substr($filepath, 0, -4) . '.json', json_encode($newEntry, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT), LOCK_EX);
     } catch (Exception $e) {
         error_log("Error saving to Datenhalde: " . $e->getMessage());
         return false;
