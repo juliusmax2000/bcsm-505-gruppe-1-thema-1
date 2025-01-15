@@ -6,12 +6,12 @@ function saveToDatahalde($data, $filepath) {
         // Prepare new entry -  stellentyp and fachbereich are now arrays
         $newEntry = [
             'timestamp' => date('Y-m-d H:i:s'),
-            'firma' => $data['firmenname'],
-            'standort' => $data['standort'],
-            'stelle' => $data['stellenbezeichnung'],
-            'typ' => $data['stellentyp'], // Store as an array
-            'fachbereich' => $data['fachbereich'], // Store as an array
-            'pdf_filename' => $data['pdf_filename']
+            'firma' => mb_convert_encoding($data['firmenname'], 'UTF-8', 'auto'),
+            'standort' => mb_convert_encoding($data['standort'], 'UTF-8', 'auto'),
+            'stelle' => mb_convert_encoding($data['stellenbezeichnung'], 'UTF-8', 'auto'),
+            'typ' => mb_convert_encoding($data['stellentyp'], 'UTF-8', 'auto'), // Store as an array
+            'fachbereich' => mb_convert_encoding($data['fachbereich'], 'UTF-8', 'auto'), // Store as an array
+            'pdf_filename' => mb_convert_encoding($data['pdf_filename'], 'UTF-8', 'auto')
         ];
         
         // Save back to file

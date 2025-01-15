@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $error_message = 'Die Datei ist zu groß! Maximale Größe ist 5MB.';
             } else {
                 // Create a unique id
-                $unique_id = uniqid();
+                $unique_id = uniqid(mt_rand(100,1000000));
                 if (!is_dir(UPLOAD_DIR . $unique_id)) {
                     mkdir(UPLOAD_DIR . $unique_id, 0755, true);
                 }
