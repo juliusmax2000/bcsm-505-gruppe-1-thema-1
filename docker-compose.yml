@@ -2,13 +2,16 @@ version: '3.8'
 
 services:
   caddy:
-    image: caddy:2-alpine
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "80:80"
       - "443:443"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - ./public:/var/www/html
+      - ./ssl:/etc/ssl
       - caddy_data:/data
       - caddy_config:/config
     depends_on:
